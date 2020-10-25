@@ -44,3 +44,8 @@ This app has all the features from basic to advanced, and following are few of t
 * Changing theme color.
 * Search feature with suggestions.
 * Reporting products using mail.
+
+## Contributors
+
+* [YESWANTH KUMAR TIRUTHANI](https://www.linkedin.com/in/yeswanth-kumar-tiruthani/)
+* [PRUTHIRAJ PATRA](https://www.linkedin.com/in/pruthiraj-patra-2a5525176/)
