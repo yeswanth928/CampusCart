@@ -4,8 +4,8 @@ import 'package:social_app_code/authentication/auth_exception_handling.dart';
 import 'package:social_app_code/authentication/authenticator.dart';
 import 'package:social_app_code/custom_widgets/raised_button_for_login.dart';
 import 'package:social_app_code/custom_widgets/show_dialog.dart';
-import 'package:social_app_code/decoration/formTextFieldBorder.dart';
-import 'package:social_app_code/decoration/paddingForRegistrationForms.dart';
+import 'package:social_app_code/decoration/form_text_field_border.dart';
+import 'package:social_app_code/decoration/padding_for_registration_forms.dart';
 import 'package:social_app_code/source_code/create_account.dart';
 import 'package:social_app_code/source_code/forgot_password.dart';
 

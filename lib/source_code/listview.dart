@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_code/custom_widgets/custom_search.dart';
@@ -6,7 +7,8 @@ import 'package:social_app_code/custom_widgets/item_list_tile.dart';
 import 'package:social_app_code/custom_widgets/show_dialog.dart';
 import 'main_drawer.dart';
 
-// The list that will be displayed on choosing a category in TheHomePageView
+// The list that will be displayed on choosing a category in TheHomePageView.
+// If the college and zip code entered are not proper or if college and zip code is not entered, then an dialog is displayed and users are navigated back to home screen after 2 seconds.
 class TheListView extends StatefulWidget {
   final String category; // The category choosen from TheHomePageView.
   TheListView({Key key, @required this.category}) : super(key: key);
@@ -44,6 +46,8 @@ class _TheListView extends State<TheListView> {
 
   List<String> saved = [];
 
+  DocumentSnapshot userDoc; // The user details.
+
   List<DocumentSnapshot> results =
       []; // The list that stores the details that will be dispalyed in that page.
 
@@ -60,6 +64,8 @@ class _TheListView extends State<TheListView> {
     /// Change products to widget.value
     QuerySnapshot eventsQuery = await dbRef
         .where("category", isEqualTo: widget.category)
+        .where("college", isEqualTo: userDoc.data()["college"])
+        .where("collegeAddress", isEqualTo: userDoc.data()["collegeAddress"])
         .orderBy("name")
         .limit(_itemsPerPage)
         .startAfterDocument(nextDocument)
@@ -116,6 +122,8 @@ class _TheListView extends State<TheListView> {
     /// Change products to widget.value
     QuerySnapshot eventsQuery = await dbRef
         .where("category", isEqualTo: widget.category)
+        .where("college", isEqualTo: userDoc.data()["college"])
+        .where("collegeAddress", isEqualTo: userDoc.data()["collegeAddress"])
         .orderBy("name")
         .limitToLast(_itemsPerPage)
         .endBeforeDocument(prevDocument)
@@ -141,6 +149,35 @@ class _TheListView extends State<TheListView> {
     // print(results[0].data()["name"].toString());
   }
 
+  // get the user details.
+  Future<void> initializeUser() async {
+    String userId = FirebaseAuth.instance.currentUser.uid;
+    userDoc =
+        await FirebaseFirestore.instance.collection("users").doc(userId).get();
+    if (!userDoc.exists) {
+      showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+                title: Text(
+                  "Info",
+                  style: TextStyle(color: Theme.of(context).primaryColor),
+                ),
+                content: Text(
+                    "Please make sure you have entered proper college name and Zip Code."),
+              ));
+
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.of(context).pop();
+        Navigator.of(context).pop();
+      });
+    }
+  }
+
+  callInitialize() async {
+    await initializeUser();
+    _fetch();
+  }
+
 // Fetch the initial page from firestore.
   _fetch() async {
     setState(() {
@@ -150,6 +187,9 @@ class _TheListView extends State<TheListView> {
         .collection("products"); // change products to widget.value
     QuerySnapshot eventsQuery = await dbRef
         .where("category", isEqualTo: widget.category)
+        .where("college", isEqualTo: userDoc.data()["college"] ?? "college")
+        .where("collegeAddress",
+            isEqualTo: userDoc.data()["collegeAddress"] ?? "collegeAddress")
         .orderBy("name")
         .limit(_itemsPerPage)
         .get();
@@ -181,7 +221,8 @@ class _TheListView extends State<TheListView> {
   void initState() {
     if (_currentPage == 0) {
       _currentPage += 1;
-      _fetch();
+      callInitialize();
+      // _fetch();
     }
     super.initState();
   }

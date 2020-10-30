@@ -9,7 +9,7 @@ import 'package:social_app_code/custom_widgets/show_snack_bar.dart';
 import 'package:social_app_code/functions/split_string.dart';
 import 'package:uuid/uuid.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:social_app_code/decoration/formTextFieldBorder.dart';
+import 'package:social_app_code/decoration/form_text_field_border.dart';
 
 // This page has only portarit mode configuration please change to satisfy landscape orientation too.
 

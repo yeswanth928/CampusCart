@@ -44,6 +44,7 @@ This app has all the features from basic to advanced, and following are few of t
 * Changing theme color.
 * Search feature with suggestions.
 * Reporting products using mail.
+* Image caching.
 
 ## Contributors
 

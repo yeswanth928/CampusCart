@@ -156,12 +156,37 @@ class TheCustomSearchPage extends SearchDelegate {
         : ListView.builder(
             itemCount: suggestionsList.length,
             itemBuilder: (context, index) => ListTile(
-                  contentPadding: EdgeInsets.only(top: 5, bottom: 0),
-                  title: Text(
-                    suggestionsList[index].data()["name"],
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.w400),
+                  hoverColor: Colors.blueGrey[300],
+                  title: Container(
+                    padding: EdgeInsets.all(
+                        MediaQuery.of(context).size.width * 0.02),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      color: Colors.blueGrey[100],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.7,
+                          child: Text(
+                            suggestionsList[index].data()["name"],
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                color: Colors.grey[600],
+                                fontWeight: FontWeight.w400),
+                          ),
+                        ),
+                        Container(
+                          alignment: Alignment.centerRight,
+                          width: MediaQuery.of(context).size.width * 0.1,
+                          child: Icon(
+                            Icons.keyboard_arrow_up,
+                            color: Colors.grey[600],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                   onTap: () {
                     query = suggestionsList[index].data()["name"];

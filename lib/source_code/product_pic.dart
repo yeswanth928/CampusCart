@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 // Used by product page to display image
 class ProductPic extends StatelessWidget {
@@ -15,19 +16,27 @@ class ProductPic extends StatelessWidget {
       child: AspectRatio(
         aspectRatio: this.aspectRatio,
         child: Card(
-          clipBehavior: Clip.hardEdge,
-          color: Theme.of(context).primaryColor,
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(7.5
-                  // MediaQuery.of(context).size.width * 0.05
-                  ),
-              side: BorderSide(
-                  width: 4,
-                  color: Theme.of(context).backgroundColor,
-                  style: BorderStyle.solid)),
-          child: Image.network(this.imageName),
-        ),
+            clipBehavior: Clip.hardEdge,
+            color: Theme.of(context).primaryColor,
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(7.5
+                    // MediaQuery.of(context).size.width * 0.05
+                    ),
+                side: BorderSide(
+                    width: 4,
+                    color: Theme.of(context).backgroundColor,
+                    style: BorderStyle.solid)),
+            child: CachedNetworkImage(
+              imageUrl: this.imageName,
+              placeholder: (context, imageName) =>
+                  Image.asset("images/placeholder.jpg"),
+              errorWidget: (context, imageName, error) =>
+                  Image.asset("images/placeholder.jpg"),
+            )
+
+            // Image.network(this.imageName),
+            ),
       ),
     );
   }

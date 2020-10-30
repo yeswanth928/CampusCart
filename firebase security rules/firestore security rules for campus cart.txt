@@ -1,0 +1,75 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+  	// the default rule
+    //match /{document=**} {
+      //allow read, write: if true;
+    //}
+    
+    
+    
+    // Functions used by firestore security rules.
+    
+    // checks if request doesn't have college and collegeAddress field else verifies if they are valid.
+    function isCollege(){
+    return (  !(request.resource.data.keys().hasAny(['college','collegeAddress'])) || ( (request.resource.data.keys().hasAny(['college']) && request.resource.data.keys().hasAny(['collegeAddress'])) &&  (exists(/databases/$(database)/documents/colleges/$(request.resource.data.collegeAddress)) && request.resource.data.college in get(/databases/$(database)/documents/colleges/$(request.resource.data.collegeAddress)).data.colleges) )   );
+    }
+    
+    
+    // Checks if the entered pincode of college address exists in database and also if the college entered is located at the address entered
+    function isCollegeAddress(){
+    return request.resource.data.keys().hasAny(['collegeAddress']) && exists(/databases/$(database)/documents/colleges/$(request.resource.data.collegeAddress)) && request.resource.data.college in get(/databases/$(database)/documents/colleges/$(request.resource.data.collegeAddress)).data.colleges;
+    }
+    
+    
+    
+    
+    // Firestore security rules for colleges collection
+    
+    // Allow all the users to read the list of colleges and do not allow anyone to update the list of colleges.
+    //  List of colleges allowed can only be updated using firebase console
+    match /colleges/{documentID}{
+    allow read: if request.auth != null;
+    allow write: if false;
+    }
+    
+    
+    
+    // Firestore security rules for users collection
+    
+    match /users/{documentID}{
+    // Allow only the owner to view his personal data
+    allow read: if request.auth!= null && documentID == request.auth.uid;
+    
+    // Allow  creating a document if you are only authenticated
+    allow create: if request.auth!= null && request.resource.data.name is string &&  isCollegeAddress();
+    
+    // Allow updating a document if the document id is same as request uid
+    allow update: if request.auth!= null && documentID == request.auth.uid && isCollege();
+  
+    
+     // Allow deleting a document if the document id is same as request uid
+    allow delete: if request.auth!= null && documentID == request.auth.uid;
+    
+    }
+    
+    
+    
+    // Firestore security rules for products collection
+    
+    match /products/{documentID}{
+    // Allow every one to read as products should be visible to everyone
+    allow read: if(request.auth != null);
+    
+     // Allow creating a document if the owner id is same as request uid
+    allow create: if (request.auth!= null) && (request.resource.data.uid == request.auth.uid) && isCollegeAddress();
+    
+    // Allow deleting a document if the owner id is same as request uid
+    allow delete: if request.auth!= null && resource.data.uid == request.auth.uid;
+    
+    // Allow updating a document if the owner id is same as request uid
+    allow update: if request.auth!= null && resource.data.uid == request.auth.uid && resource.data.uid == request.auth.uid && request.resource.data.uid == request.auth.uid && request.resource.data.college in get(/databases/$(database)/documents/colleges/$(request.resource.data.collegeAddress)).data.colleges;
+    }
+  }
+}

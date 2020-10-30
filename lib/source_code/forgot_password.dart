@@ -4,8 +4,8 @@ import 'package:social_app_code/authentication/auth_exception_handling.dart';
 import 'package:social_app_code/authentication/authenticator.dart';
 import 'package:social_app_code/custom_widgets/raised_button_for_login.dart';
 import 'package:social_app_code/custom_widgets/show_dialog.dart';
-import 'package:social_app_code/decoration/formTextFieldBorder.dart';
-import 'package:social_app_code/decoration/paddingForRegistrationForms.dart';
+import 'package:social_app_code/decoration/form_text_field_border.dart';
+import 'package:social_app_code/decoration/padding_for_registration_forms.dart';
 
 // This class builds a scaffold that displays the forgot password page and on entering a valid registeres email id, an password reset email will be sent to your email account.
 class ForgotEmailPassword extends StatefulWidget {

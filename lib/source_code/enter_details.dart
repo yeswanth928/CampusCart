@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:social_app_code/custom_widgets/show_dialog.dart';
 import 'package:social_app_code/models/user.dart';
-import 'package:social_app_code/decoration/formTextFieldBorder.dart';
+import 'package:social_app_code/decoration/form_text_field_border.dart';
 
 // The Scaffold that is used to enter user details like name, college, college Address.
 class ModifyDetailsPage extends StatefulWidget {
@@ -29,17 +29,79 @@ class _ModifyDetailsPageState extends State<ModifyDetailsPage> {
   TextEditingController collegeAddress =
       TextEditingController(); // controller for collegeAddress field.
 
+  bool isCollegeEnabled =
+      false; // true if the college field is enabled else false
+
+  List<String> collegesList = []; // list of colleges for the selected zip code.
+
+  List<Widget> radioCollegeList =
+      []; // list of colleges to be displayed in simple dialog button form.
+
+  String initialZipCode; // the initial zip code fetched from the disk.
+
   SharedPreferences myPrefs; // SharedPreference variable to get instance of it.
+
+  @override
+  void dispose() {
+    collegeAddress.dispose();
+    college.dispose();
+    name.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       final userVar = Provider.of<TheUser>(context, listen: false);
-      name.text = userVar.userName();
-      college.text = userVar.userCollege();
-      collegeAddress.text = userVar.userCollegeAddress();
+      name.text = userVar.userName() ?? "User Name";
+      college.text = userVar.userCollege() ?? " College Name";
+      college.value =
+          TextEditingValue(text: userVar.userCollege() ?? "College Name");
+      collegeAddress.text = userVar.userCollegeAddress() ?? "Zip Code";
+      initialZipCode = userVar.userCollegeAddress();
     });
     super.initState();
+  }
+
+  // fetch list of colleges in zip code area
+  Future<void> fetchColleges() async {
+    collegesList.clear();
+    radioCollegeList.clear();
+    await FirebaseFirestore.instance
+        .collection('colleges')
+        .doc(collegeAddress.text)
+        .get()
+        .then((value) => {
+              value.data()["colleges"].forEach((element) {
+                collegesList.add(element);
+                radioCollegeList.add(ListTile(
+                  title: Text(
+                    element,
+                    overflow: TextOverflow.ellipsis,
+                    semanticsLabel: element,
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
+                  onTap: () {
+                    college.value = TextEditingValue(text: element);
+                    Navigator.pop(context);
+                  },
+                ));
+              })
+            });
+    selectCollege(context);
+  }
+
+  // select a college from the list of colleges displayed in simple dialog.
+  selectCollege(context) {
+    showDialog(
+        context: context,
+        builder: (context) => SimpleDialog(
+              title: Text(
+                "Select your college",
+                style: TextStyle(color: Theme.of(context).primaryColor),
+              ),
+              children: radioCollegeList,
+            ));
   }
 
   // Upload the entered details to firestore.
@@ -104,7 +166,48 @@ class _ModifyDetailsPageState extends State<ModifyDetailsPage> {
                 child: Container(),
                 flex: 3,
               ),
+              Expanded(
+                flex: 3,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: TextFormField(
+                    controller:
+                        collegeAddress, // assigned the collegeAddress controller.
 
+                    cursorColor: Theme.of(context).primaryColor,
+
+                    keyboardType: TextInputType.number,
+
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+
+                    decoration: inputBorder(context,
+                        "College Location Zip Code", Icons.add_location),
+
+                    onEditingComplete: () async {
+                      if (collegeAddress.text.length == 6) {
+                        FocusScope.of(context).unfocus();
+                        await fetchColleges();
+
+                        // setState(() {
+                        //   isCollegeEnabled = true;
+                        // });
+                      }
+                    },
+
+                    validator: (value) {
+                      if (collegeAddress.text.length != 6) {
+                        return "Enter a valid College Address Zip Code";
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+              ),
+
+              Expanded(
+                child: Container(),
+                flex: 3,
+              ),
               Expanded(
                 flex: 3,
                 child: Padding(
@@ -117,40 +220,11 @@ class _ModifyDetailsPageState extends State<ModifyDetailsPage> {
                     style: TextStyle(color: Theme.of(context).primaryColor),
 
                     decoration: inputBorder(context, "College", Icons.business),
-
+                    enabled: isCollegeEnabled,
                     validator: (value) {
-                      if (name.text.length == 0) {
+                      if (college.text.length == 0 ||
+                          !(collegesList.contains(college.text))) {
                         return "!Enter a valid College name.";
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ),
-
-              Expanded(
-                child: Container(),
-                flex: 3,
-              ),
-
-              Expanded(
-                flex: 3,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TextFormField(
-                    controller:
-                        collegeAddress, // assigned the collegeAddress controller.
-
-                    cursorColor: Theme.of(context).primaryColor,
-
-                    style: TextStyle(color: Theme.of(context).primaryColor),
-
-                    decoration: inputBorder(
-                        context, "College Address", Icons.add_location),
-
-                    validator: (value) {
-                      if (name.text.length == 0) {
-                        return "Enter a valid College Address.";
                       }
                       return null;
                     },
@@ -172,6 +246,9 @@ class _ModifyDetailsPageState extends State<ModifyDetailsPage> {
                       elevation: 10,
                       onPressed: () {
                         if (_editFormKey.currentState.validate()) {
+                          setState(() {
+                            isCollegeEnabled = false;
+                          });
                           uploadDetailsToFirestore();
                           reInitializeTheUserFromFirestore(context);
                           showAlertDialogBox(

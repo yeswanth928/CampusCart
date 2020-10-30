@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_app_code/functions/add_product_to_cart.dart';
@@ -49,9 +50,10 @@ class _TheItemListTile extends State<TheItemListTile> {
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       fit: BoxFit.fitWidth,
-                      image: NetworkImage(
-                        widget.img,
-                      ),
+                      image: CachedNetworkImageProvider(widget.img),
+                      // NetworkImage(
+                      //   widget.img,
+                      // ),
                     ),
                   ),
                 ),

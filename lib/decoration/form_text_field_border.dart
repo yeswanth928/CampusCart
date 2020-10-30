@@ -16,6 +16,7 @@ InputDecoration inputBorder(
     border: _outlineInputBorder(context),
     focusedBorder: _outlineInputBorder(context),
     enabledBorder: _outlineInputBorder(context),
+    disabledBorder: _outlineInputBorder(context),
     errorBorder: _outlineInputBorder(context),
     focusedErrorBorder: _outlineInputBorder(context),
     labelText: label,

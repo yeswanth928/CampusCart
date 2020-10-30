@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:social_app_code/decoration/formTextFieldBorder.dart';
-import 'package:social_app_code/decoration/paddingForRegistrationForms.dart';
+import 'package:social_app_code/decoration/form_text_field_border.dart';
+import 'package:social_app_code/decoration/padding_for_registration_forms.dart';
 import 'package:social_app_code/source_code/home_page.dart';
 
 // The code here is similar to register_phone_number.dart  except for the validator function and icon and label of the text form fields and also the name of the text controller.
