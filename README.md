@@ -1,5 +1,7 @@
 # Campus Cart
 
+![Campus Cart](/images/logo_curved_png_1080.png)
+
 This is an E-Commerce Application Customer-to-Customer platform.
 And one thing that sets this apart from rest of the mobile applications would be that this app is that the idea, as it is useful and we don't have popular apps that offer this required service. This app is not meant for everyone, this is specially being developed for **students**.
 
